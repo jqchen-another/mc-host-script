@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>第6步-生成</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <h1>主持稿生成器</h1>
+      <div class="sub">一步一步填写 → 手动选环节 → 生成可直接照读的主持稿</div>
+    </div>
+    <div class="stepper" aria-label="步骤">
+      <span class="step" data-step>1. 基础信息</span>
+<span class="step" data-step>2. 主题</span>
+<span class="step" data-step>3. 风格</span>
+<span class="step" data-step>4. 人物</span>
+<span class="step" data-step>5. 环节</span>
+<span class="step" data-step>6. 生成</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  
+<section class="card">
+  <h2>第 6 步：生成结果</h2>
+  <p class="hint">这是可直接照读的完整主持稿。你可以复制、打印，或下载 txt。</p>
+
+  <div class="actions">
+    <button class="ghost" id="back">上一步</button>
+    <button class="ghost" id="copy">复制全文</button>
+    <button class="ghost" id="download">下载 TXT</button>
+    <button class="ghost" id="print">打印 / 导出 PDF</button>
+    <button class="danger" id="reset" onclick="if(confirm('确定清空并重新开始吗？')){resetState();window.location.href='step1-basic.html';}">重新开始</button>
+  </div>
+
+  <hr class="sep" />
+
+  <div class="article-wrap" id="article">生成中…</div>
+
+  <hr class="sep" />
+  <div class="hint">小技巧：现场只要照着【主持台词】读就行；紧张时先读目录，再按段落推进。</div>
+</section>
+
+</main>
+
+<script src="../assets/app.js"></script>
+<script>
+  // 等待DOM完全加载后再执行
+  document.addEventListener('DOMContentLoaded', function() {
+    setStepper(5);
+    
+    const backBtn = document.getElementById("back");
+    const printBtn = document.getElementById("print");
+    
+    if (backBtn) backBtn.onclick = () => go("step5-segments.html");
+    if (printBtn) printBtn.onclick = () => window.print();
+  });
+  
+(async () => {
+  try {
+    const st = getState();
+    console.log("当前状态:", st);
+    
+    if (!st.themeId) { alert("请先选择主题"); go("step2-theme.html"); return; }
+    if (!st.selectedSegments || !st.selectedSegments.length) { alert("请先选择环节"); go("step5-segments.html"); return; }
+    
+    // 应用当前主题样式并播放庆祝动画
+    try {
+      setPageTheme(st.themeId);
+      showThemeIcon(st.themeId);
+      showCelebration();
+    } catch (e) {
+      console.error("主题应用错误:", e);
+    }
+
+    console.log("加载主题:", st.themeId);
+    const themeData = await loadThemeSegments(st.themeId);
+    console.log("主题数据:", themeData);
+    
+    if (!themeData || !themeData.segments) {
+      throw new Error("主题数据格式错误: 缺少segments");
+    }
+    
+    const articleHtml = buildResultHtml(themeData, st);
+    document.getElementById("article").innerHTML = articleHtml;
+
+    const fullText = buildResultText(themeData, st);
+    
+    // 绑定按钮事件
+    const copyBtn = document.getElementById("copy");
+    const downloadBtn = document.getElementById("download");
+    
+    if (copyBtn) {
+      copyBtn.onclick = async () => {
+        const ok = await copyText(fullText);
+        alert(ok ? "已复制到剪贴板 ✅" : "复制失败：你可以手动全选复制");
+      };
+    }
+    
+    if (downloadBtn) {
+      downloadBtn.onclick = () => {
+        const name = (st.themeName || "主持稿").replace(/[\\/:*?"<>|]/g,"_");
+        downloadText(`${name}.txt`, fullText);
+      };
+    }
+  } catch (err) {
+    console.error("生成稿件失败:", err);
+    document.getElementById("article").innerHTML = `<div style="color:red;padding:20px;">生成稿件失败: ${escapeHtml(err.message)}<br>请检查控制台获取详细信息。</div>`;
+  }
+})();
+
+</script>
+</body>
+</html>

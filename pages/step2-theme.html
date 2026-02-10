@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>第2步-主题</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <style>
+    .theme-preview {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, var(--bg) 0%, #fff 100%);
+      border-radius: 16px;
+      margin: 16px 0;
+      border: 2px dashed var(--border);
+    }
+    .theme-preview-icon {
+      font-size: 80px;
+      margin-bottom: 16px;
+      animation: bounce 2s ease infinite;
+    }
+    .theme-preview-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    .theme-preview-desc {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .theme-select-wrapper {
+      position: relative;
+      display: block;
+    }
+    .theme-select-wrapper::after {
+      content: '▼';
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+      pointer-events: none;
+      font-size: 12px;
+    }
+    #theme {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      width: 100%;
+      padding: 16px 45px 16px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--primary);
+      background: #fff;
+      border: 2px solid var(--primary);
+      border-radius: 14px;
+      cursor: pointer;
+      outline: none;
+    }
+    #theme:focus {
+      box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15);
+    }
+    #theme option {
+      font-size: 16px;
+      padding: 10px;
+      color: #333;
+    }
+    .decoration-sample {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <h1>主持稿生成器</h1>
+      <div class="sub">一步一步填写 → 手动选环节 → 生成可直接照读的主持稿</div>
+    </div>
+    <div class="stepper" aria-label="步骤">
+      <span class="step" data-step>1. 基础信息</span>
+<span class="step" data-step>2. 主题</span>
+<span class="step" data-step>3. 风格</span>
+<span class="step" data-step>4. 人物</span>
+<span class="step" data-step>5. 环节</span>
+<span class="step" data-step>6. 生成</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  
+<section class="card">
+  <h2>第 2 步：选择主题</h2>
+  <p class="hint">主题决定"环节库"和整体氛围。你之后会手动勾选具体环节。</p>
+
+  <div style="margin-bottom: 16px;">
+    <label for="theme">主题类型</label>
+    <select id="theme" style="width: 100%; padding: 16px; border-radius: 14px; border: 2px solid #e74c3c; font-size: 16px; font-weight: 600; background: white; color: #e74c3c; z-index: 1000; min-height: 48px;">
+      <option value="generic">通用宴会</option>
+      <option value="wedding">婚礼</option>
+      <option value="engagement">订婚宴</option>
+      <option value="homecoming">回门宴</option>
+      <option value="graduation">升学宴</option>
+      <option value="thanks_teacher">谢师宴</option>
+      <option value="baby100">百日宴/满月宴</option>
+      <option value="birthday">生日宴</option>
+      <option value="longevity">寿宴</option>
+      <option value="housewarming">乔迁宴</option>
+      <option value="annualparty">公司年会/庆功宴</option>
+    </select>
+  </div>
+
+  <div class="theme-preview" id="themePreview">
+    <div class="theme-preview-icon" id="previewIcon">🎊</div>
+    <div class="theme-preview-name" id="previewName">通用宴会</div>
+    <div class="theme-preview-desc" id="previewDesc">任何宴会都能用的兜底版本。</div>
+    <div class="decoration-sample" id="decorationSample"></div>
+  </div>
+
+  <div class="actions">
+    <button class="ghost" id="back">上一步</button>
+    <button class="primary" id="next">下一步：选风格</button>
+  </div>
+</section>
+
+<section class="card">
+  <h2>💡 提示</h2>
+  <p class="hint">选择不同主题后，页面会变换对应的喜庆配色和背景音乐，让你提前感受氛围！</p>
+</section>
+
+</main>
+
+<script src="../assets/app.js"></script>
+<script>
+  setStepper(1);
+  
+// 使用 app.js 中的主题配置，不需要重复声明
+
+(async () => {
+  try {
+    const st = getState();
+    let themes;
+    try {
+      themes = await loadThemes();
+    } catch (e) {
+      console.error('加载主题列表失败:', e);
+      themes = { themes: [] };
+    }
+    const sel = qs("#theme");
+    if (!sel) {
+      console.error('未找到主题选择框');
+      return;
+    }
+    if (themes.themes && themes.themes.length > 0) {
+      sel.innerHTML = themes.themes.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+    } else {
+      // 使用默认主题列表
+      const defaultThemes = [
+        { id: 'generic', name: '通用宴会' },
+        { id: 'wedding', name: '婚礼' },
+        { id: 'engagement', name: '订婚宴' },
+        { id: 'homecoming', name: '回门宴' },
+        { id: 'graduation', name: '升学宴' },
+        { id: 'thanks_teacher', name: '谢师宴' },
+        { id: 'baby100', name: '百日宴/满月宴' },
+        { id: 'birthday', name: '生日宴' },
+        { id: 'longevity', name: '寿宴' },
+        { id: 'housewarming', name: '乔迁宴' },
+        { id: 'annualparty', name: '公司年会/庆功宴' }
+      ];
+      sel.innerHTML = defaultThemes.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+      themes.themes = defaultThemes;
+    }
+
+    const updatePreview = () => {
+      try {
+        const id = sel.value;
+        const t = themes.themes.find(x => x.id === id);
+        const config = THEME_CONFIG[id] || THEME_CONFIG.generic;
+        
+        // 更新预览
+        const previewIcon = qs("#previewIcon");
+        if (previewIcon) previewIcon.textContent = config.icon || '🎊';
+        const previewName = qs("#previewName");
+        if (previewName) previewName.textContent = t?.name || '';
+        const previewDesc = qs("#previewDesc");
+        if (previewDesc) previewDesc.textContent = t?.desc || '';
+        
+        // 更新装饰预览
+        const decorationSample = qs("#decorationSample");
+        if (decorationSample && config.decorations) {
+          decorationSample.innerHTML = config.decorations
+            .map(d => `<span>${d}</span>`)
+            .join('');
+        }
+        
+        // 应用主题到页面
+        if (document.body) {
+          document.body.setAttribute('data-theme', id);
+        }
+        
+        // 重新启动飘落装饰
+        if (config.decorations) {
+          startFallingDecorations(config.decorations);
+        }
+        
+        // 更新音乐
+        createMusicPlayer(id);
+      } catch (err) {
+        console.error('更新主题预览失败:', err);
+      }
+    };
+
+    sel.value = st.themeId || (themes.themes[0]?.id || 'generic');
+    updatePreview();
+    sel.addEventListener("change", updatePreview);
+
+    const backBtn = qs("#back");
+    if (backBtn) backBtn.addEventListener("click", () => go("step1-basic.html"));
+    const nextBtn = qs("#next");
+    if (nextBtn) nextBtn.addEventListener("click", () => {
+      const id = sel.value;
+      const t = themes.themes.find(x => x.id === id);
+      setState({ themeId: id, themeName: t?.name || "" , selectedSegments: [] });
+      go("step3-style.html");
+    });
+  } catch (error) {
+    console.error('主题页面初始化失败:', error);
+  }
+})();
+</script>
+</body>
+</html>
