@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>第4步-人物</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <h1>主持稿生成器</h1>
+      <div class="sub">一步一步填写 → 手动选环节 → 生成可直接照读的主持稿</div>
+    </div>
+    <div class="stepper" aria-label="步骤">
+      <span class="step" data-step>1. 基础信息</span>
+<span class="step" data-step>2. 主题</span>
+<span class="step" data-step>3. 风格</span>
+<span class="step" data-step>4. 人物</span>
+<span class="step" data-step>5. 环节</span>
+<span class="step" data-step>6. 生成</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  
+<section class="card">
+  <h2>第 4 步：填写人物信息</h2>
+  <p class="hint">不同主题对人物称呼略有不同：婚礼/订婚/回门会用“新郎新娘”；其他主题会用“主角”。父母信息会出现在感谢/致谢相关段落。</p>
+
+  <div class="notice" id="peopleTip">加载中…</div>
+
+  <div id="coupleBox" style="display:none">
+    <div class="row">
+      <div>
+        <label for="groom">新郎姓名</label>
+        <input id="groom" placeholder="例如：张伟" />
+      </div>
+      <div>
+        <label for="bride">新娘姓名</label>
+        <input id="bride" placeholder="例如：李娜" />
+      </div>
+    </div>
+  </div>
+
+  <div id="mainBox" style="display:none">
+    <label for="mainPerson">主角姓名（升学宴/寿宴等）</label>
+    <input id="mainPerson" placeholder="例如：王同学 / 张爷爷" />
+  </div>
+
+  <hr class="sep" />
+
+  <h2 style="margin-top:0">双方父母（只需要父母）</h2>
+
+  <div class="row">
+    <div>
+      <label for="groomFather">男方父亲（可写称呼或姓名）</label>
+      <input id="groomFather" placeholder="例如：张叔叔 / 张先生" />
+    </div>
+    <div>
+      <label for="groomMother">男方母亲（可写称呼或姓名）</label>
+      <input id="groomMother" placeholder="例如：王阿姨 / 王女士" />
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label for="brideFather">女方父亲（可写称呼或姓名）</label>
+      <input id="brideFather" placeholder="例如：李叔叔 / 李先生" />
+    </div>
+    <div>
+      <label for="brideMother">女方母亲（可写称呼或姓名）</label>
+      <input id="brideMother" placeholder="例如：赵阿姨 / 赵女士" />
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="ghost" id="back">上一步</button>
+    <button class="primary" id="next">下一步：选环节</button>
+  </div>
+</section>
+
+</main>
+
+<script src="../assets/app.js"></script>
+<script>
+  setStepper(3);
+  
+(async () => {
+  const st = getState();
+  if (!st.themeId) { alert("请先选择主题"); go("step2-theme.html"); return; }
+  
+  // 应用当前主题样式
+  setPageTheme(st.themeId);
+  showThemeIcon(st.themeId);
+
+  const themes = await loadThemes();
+  const theme = themes.themes.find(t => t.id === st.themeId);
+
+  const coupleThemes = new Set(["wedding","engagement","homecoming"]);
+  const isCouple = coupleThemes.has(st.themeId);
+
+  qs("#coupleBox").style.display = isCouple ? "" : "none";
+  qs("#mainBox").style.display = isCouple ? "none" : "";
+  qs("#peopleTip").innerHTML = `<b>当前主题：</b> ${escapeHtml(theme?.name || "")}。${isCouple ? "请填写新郎新娘姓名。" : "请填写主角姓名。"} 父母信息可不填，但填写后会更自然。`;
+
+  // fill values
+  qs("#groom").value = st.groom || "新郎";
+  qs("#bride").value = st.bride || "新娘";
+  qs("#mainPerson").value = st.mainPerson || "主角";
+  qs("#groomFather").value = st.groomFather || "父亲";
+  qs("#groomMother").value = st.groomMother || "母亲";
+  qs("#brideFather").value = st.brideFather || "父亲";
+  qs("#brideMother").value = st.brideMother || "母亲";
+
+  qs("#back").addEventListener("click", () => go("step3-style.html"));
+  qs("#next").addEventListener("click", () => {
+    const patch = {
+      groom: qs("#groom").value.trim(),
+      bride: qs("#bride").value.trim(),
+      mainPerson: qs("#mainPerson").value.trim(),
+      groomFather: qs("#groomFather").value.trim(),
+      groomMother: qs("#groomMother").value.trim(),
+      brideFather: qs("#brideFather").value.trim(),
+      brideMother: qs("#brideMother").value.trim(),
+    };
+    // Required: couple needs groom+bride; non-couple needs mainPerson
+    if (isCouple) {
+      if (!patch.groom || !patch.bride) { alert("请填写新郎姓名和新娘姓名"); return; }
+    } else {
+      if (!patch.mainPerson) { alert("请填写主角姓名"); return; }
+    }
+    setState(patch);
+    go("step5-segments.html");
+  });
+})();
+
+</script>
+</body>
+</html>

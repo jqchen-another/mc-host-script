@@ -1,0 +1,82 @@
+{
+  "themes": [
+    {
+      "id": "wedding",
+      "name": "婚礼",
+      "dataFile": "wedding.json",
+      "desc": "酒店婚礼全流程（迎宾-仪式-晚宴-送客）。"
+    },
+    {
+      "id": "engagement",
+      "name": "订婚宴",
+      "dataFile": "engagement.json",
+      "desc": "订婚仪式与答谢流程，更轻松。"
+    },
+    {
+      "id": "homecoming",
+      "name": "回门宴",
+      "dataFile": "homecoming.json",
+      "desc": "婚后回门答谢亲友，节奏更简洁。"
+    },
+    {
+      "id": "graduation",
+      "name": "升学宴",
+      "dataFile": "graduation.json",
+      "desc": "升学/录取庆祝，重点是感恩与祝福。"
+    },
+    {
+      "id": "thanks_teacher",
+      "name": "谢师宴",
+      "dataFile": "thanks_teacher.json",
+      "desc": "感谢老师同学，致敬成长。"
+    },
+    {
+      "id": "baby100",
+      "name": "百日宴/满月宴",
+      "dataFile": "baby100.json",
+      "desc": "宝宝百日/满月，亲友祝福。"
+    },
+    {
+      "id": "birthday",
+      "name": "生日宴",
+      "dataFile": "birthday.json",
+      "desc": "生日庆祝，氛围轻松热闹。"
+    },
+    {
+      "id": "longevity",
+      "name": "寿宴",
+      "dataFile": "longevity.json",
+      "desc": "长辈寿宴，庄重温暖。"
+    },
+    {
+      "id": "housewarming",
+      "name": "乔迁宴",
+      "dataFile": "housewarming.json",
+      "desc": "新居乔迁，喜庆分享。"
+    },
+    {
+      "id": "annualparty",
+      "name": "公司年会/庆功宴",
+      "dataFile": "annualparty.json",
+      "desc": "企业活动，流程更偏主持控场。"
+    },
+    {
+      "id": "opening",
+      "name": "开业庆典",
+      "dataFile": "opening.json",
+      "desc": "店铺/公司开业仪式，喜庆隆重。"
+    },
+    {
+      "id": "anniversary",
+      "name": "周年纪念",
+      "dataFile": "anniversary.json",
+      "desc": "公司/婚姻周年庆祝，回顾与展望。"
+    },
+    {
+      "id": "generic",
+      "name": "通用宴会",
+      "dataFile": "generic.json",
+      "desc": "任何宴会都能用的兜底版本。"
+    }
+  ]
+}
